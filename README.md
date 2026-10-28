@@ -1,144 +1,180 @@
----
+E-COMMERCE SALES DATA ANALYSIS USING SQL
 
-# **Amazon USA Sales Analysis Project - SQL **
----
+==================================================
 
-## **Project Overview**
-I have worked on analyzing a dataset of over 20,000 sales records from an Amazon-like e-commerce platform using PostgreSQL. This project involved extensive querying to understand customer behavior, product performance, and sales trends. Through it, I tackled various SQL challenges, including revenue analysis, customer segmentation, and inventory management.
+1. PROJECT OVERVIEW
 
-The project also emphasized data cleaning, managing null values, and applying structured queries to solve real-world business problems.
+This project focuses on analyzing sales data from an e-commerce platform using PostgreSQL. The analysis covers product performance, customer purchasing behavior, revenue trends, inventory management, payment statuses, shipping performance, and seller contributions.
 
-An ERD diagram was created to provide a clear visual representation of the database schema and table relationships.
+Note: This is a sample dataset created for training and learning purposes. It is not actual Amazon company data.
 
+2. PROJECT OBJECTIVES
 
----
-## **Objective**
+- Identify top-selling products and revenue-generating categories.
+- Analyze customer purchasing behavior and average order value.
+- Track monthly sales trends.
+- Calculate Customer Lifetime Value (CLTV).
+- Identify customers who have never placed an order.
+- Monitor inventory levels and low-stock products.
+- Analyze payment statuses and product returns.
+- Identify shipping delays and top-performing sellers.
 
-The primary objective of this project is to showcase SQL proficiency through complex queries that address real-world e-commerce business challenges. The analysis covers various aspects of e-commerce operations
---
-## ** SQL Concepts Used **
-Joins , case statements , window functions - Rank , Dense Rank , Lag , Group By , Having , Subqueries.
-## ** Key Insights **
-High-Value Customers: The top 10 customers contribute significantly to the overall revenue, indicating the importance of customer retention strategies.
+3. DATABASE SCHEMA
 
-Payment Efficiency: The payment success rate provides insights into the reliability of the payment processing system.
+The project uses PostgreSQL and includes the following tables:
 
-Product Performance: Identifying top-selling products helps in inventory management and marketing focus.
+- Customers: Stores customer information and location.
+- Category: Contains product category details.
+- Products: Stores product names, prices, costs, and category information.
+- Sellers: Contains seller information.
+- Orders: Stores order dates, customer IDs, seller IDs, and order statuses.
+- Order_Items: Contains product IDs, quantities, and prices for each order.
+- Payments: Stores payment dates and payment statuses.
+- Shippings: Contains shipping, delivery, and return information.
+- Inventory: Stores stock levels and warehouse information.
 
-Return Rates: Products with high return rates may require quality assessment or better customer education.
+4. TOOLS AND TECHNOLOGIES
 
-Seller Contributions: Understanding which sellers generate the most revenue can inform partnership and commission strategies.
+- Database: PostgreSQL
+- Query Language: SQL
+- Dataset Format: CSV files
+- SQL Concepts Used:
+  - Joins
+  - Aggregate Functions
+  - GROUP BY and HAVING
+  - Subqueries
+  - Common Table Expressions (CTEs)
+  - CASE Statements
+  - Window Functions, including RANK() and LAG()
 
-## **Database Setup & Design**
+5. PROJECT FILES
 
-### **Schema Structure**
+- AMAZON SQL PROJECT SCHEMA.sql
+  Creates database tables and relationships.
 
-```sql
-CREATE TABLE category
-(
-  category_id	INT PRIMARY KEY,
-  category_name VARCHAR(20)
-);
+- AMAZON SQL PROJECT EDA.sql
+  Contains exploratory data analysis queries.
 
--- customers TABLE
-CREATE TABLE customers
-(
-  customer_id INT PRIMARY KEY,	
-  first_name	VARCHAR(20),
-  last_name	VARCHAR(20),
-  state VARCHAR(20),
-  address VARCHAR(5) DEFAULT ('xxxx')
-);
+- AMAZON BUSINESS PROBLEMS SOLUTIONS SQL Query.sql
+  Contains SQL solutions for business problems.
 
--- sellers TABLE
-CREATE TABLE sellers
-(
-  seller_id INT PRIMARY KEY,
-  seller_name	VARCHAR(25),
-  origin VARCHAR(15)
-);
+- Project Problems Statements .sql
+  Contains the business questions addressed in the project.
 
--- products table
-  CREATE TABLE products
-  (
-  product_id INT PRIMARY KEY,	
-  product_name VARCHAR(50),	
-  price	FLOAT,
-  cogs	FLOAT,
-  category_id INT, -- FK 
-  CONSTRAINT product_fk_category FOREIGN KEY(category_id) REFERENCES category(category_id)
-);
+- customers.csv
+  Customer dataset.
 
--- orders
-CREATE TABLE orders
-(
-  order_id INT PRIMARY KEY, 	
-  order_date	DATE,
-  customer_id	INT, -- FK
-  seller_id INT, -- FK 
-  order_status VARCHAR(15),
-  CONSTRAINT orders_fk_customers FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
-  CONSTRAINT orders_fk_sellers FOREIGN KEY (seller_id) REFERENCES sellers(seller_id)
-);
+- category.csv
+  Product category dataset.
 
-CREATE TABLE order_items
-(
-  order_item_id INT PRIMARY KEY,
-  order_id INT,	-- FK 
-  product_id INT, -- FK
-  quantity INT,	
-  price_per_unit FLOAT,
-  CONSTRAINT order_items_fk_orders FOREIGN KEY (order_id) REFERENCES orders(order_id),
-  CONSTRAINT order_items_fk_products FOREIGN KEY (product_id) REFERENCES products(product_id)
-);
+- products.csv
+  Product dataset.
 
--- payment TABLE
-CREATE TABLE payments
-(
-  payment_id	
-  INT PRIMARY KEY,
-  order_id INT, -- FK 	
-  payment_date DATE,
-  payment_status VARCHAR(20),
-  CONSTRAINT payments_fk_orders FOREIGN KEY (order_id) REFERENCES orders(order_id)
-);
+- sellers.csv
+  Seller dataset.
 
-CREATE TABLE shippings
-(
-  shipping_id	INT PRIMARY KEY,
-  order_id	INT, -- FK
-  shipping_date DATE,	
-  return_date	 DATE,
-  shipping_providers	VARCHAR(15),
-  delivery_status VARCHAR(15),
-  CONSTRAINT shippings_fk_orders FOREIGN KEY (order_id) REFERENCES orders(order_id)
-);
+- orders(1).csv
+  Order dataset.
 
-CREATE TABLE inventory
-(
-  inventory_id INT PRIMARY KEY,
-  product_id INT, -- FK
-  stock INT,
-  warehouse_id INT,
-  last_stock_date DATE,
-  CONSTRAINT inventory_fk_products FOREIGN KEY (product_id) REFERENCES products(product_id)
-  );
-```
+- order_items.csv
+  Order item dataset.
 
----
+- payments.csv
+  Payment dataset.
 
-## **Task: Data Cleaning**
+- shipping.csv
+  Shipping dataset.
 
-I cleaned the dataset by:
-- **Removing duplicates**: Duplicates in the customer and order tables were identified and removed.
-- **Handling missing values**: Null values in critical fields (e.g., customer address, payment status) were either filled with default values or handled using appropriate methods.
+- inventory.csv
+  Inventory dataset.
 
----
+- Updated ERD - Amazon.png
+  Updated entity relationship diagram.
 
-## **Handling Null Values**
+- Amazon ERD (Basic).png
+  Basic entity relationship diagram.
 
-Null values were handled based on their context:
-- **Customer addresses**: Missing addresses were assigned default placeholder values.
-- **Payment statuses**: Orders with null payment statuses were categorized as “Pending.”
-- **Shipping information**: Null return dates were left as is, as not all shipments are returned.
+6. BUSINESS PROBLEMS SOLVED
 
+Problem 1: Top-Selling Products
+Identifies the top 10 products based on total sales value and quantity sold.
+
+Problem 2: Revenue by Category
+Calculates revenue generated by each product category and its percentage contribution to total revenue.
+
+Problem 3: Average Order Value (AOV)
+Calculates the average order value for customers with more than five orders.
+
+Problem 4: Monthly Sales Trend
+Analyzes monthly sales over the past year and compares current-month sales with the previous month.
+
+Problem 5: Customers with No Purchases
+Identifies registered customers who have never placed an order.
+
+Problem 6: Least-Selling Categories by State
+Identifies the least-selling product categories in each state.
+
+Problem 7: Customer Lifetime Value (CLTV)
+Calculates and ranks customers based on their total order value.
+
+Problem 8: Inventory Stock Alerts
+Identifies products with stock levels below a specified threshold.
+
+Problem 9: Payment Success Rate
+Analyzes payment statuses and calculates their percentage distribution.
+
+Problem 10: Most-Returned Products
+Identifies products with high return counts and return percentages.
+
+Problem 11: Shipping Delays
+Identifies orders shipped more than three days after the order date.
+
+Problem 12: Top-Performing Sellers
+Ranks sellers based on total sales value.
+
+7. HOW TO RUN THE PROJECT
+
+Step 1: Set Up PostgreSQL
+Install PostgreSQL and open a SQL client such as pgAdmin.
+
+Step 2: Create a Database
+Create a new database for the project.
+
+Step 3: Create the Tables
+Execute AMAZON SQL PROJECT SCHEMA.sql to create the tables and establish foreign key relationships.
+
+Step 4: Import the Data
+Import the CSV files into their corresponding database tables. Ensure that the column names, data types, and column order match the schema.
+
+Load the parent tables before dependent tables to satisfy foreign key constraints.
+
+Step 5: Perform Exploratory Data Analysis
+Execute AMAZON SQL PROJECT EDA.sql to inspect the tables and explore the datasets.
+
+Step 6: Execute Business Queries
+Run the queries in AMAZON BUSINESS PROBLEMS SOLUTIONS SQL Query.sql to analyze sales, customers, products, inventory, payments, returns, shipping, and sellers.
+
+Note: Some business queries use a derived total_sales column in order_items. Run the relevant setup statements before executing queries that depend on this column.
+
+8. BUSINESS VALUE
+
+This project demonstrates how SQL can support e-commerce decision-making by helping to:
+
+- Identify products and categories contributing most to sales.
+- Understand customer purchasing patterns and lifetime value.
+- Monitor inventory and identify potential stock shortages.
+- Evaluate payment-status distribution.
+- Investigate product returns and shipping delays.
+- Compare seller performance and sales contributions.
+
+Actual findings should be interpreted from the query results generated using the dataset.
+
+9. CONCLUSION
+
+This project demonstrates practical SQL skills through the analysis of an e-commerce dataset. It combines database design, exploratory data analysis, and business-focused queries to extract information that can support sales analysis, inventory planning, customer analysis, and operational decision-making.
+
+The project is intended for educational purposes and portfolio demonstration.
+
+10. AUTHOR
+
+Shaurya Bothra
